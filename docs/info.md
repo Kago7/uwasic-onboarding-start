@@ -13,8 +13,8 @@ SPI PWM Module
 
 ## How to test
 
-Explain how to use your project
+Verify through testbench and attempt synthesis via workflows
 
 ## External hardware
 
-List external hardware used in your project (e.g. PMOD, LED display, etc), if any
+No external hardware so far.
