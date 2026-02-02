@@ -47,9 +47,6 @@ module spi_peripheral #(
                 // Transaction ready only after 2 bytes
                 if (bit_counter == 16) begin
                     transaction_ready <= 1;
-                    bit_counter       <= 0; 
-                end else begin
-                    transaction_ready <= 0;
                 end
             end else begin
                 // Update on transaction ready
