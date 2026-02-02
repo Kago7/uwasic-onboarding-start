@@ -33,7 +33,7 @@ module spi_peripheral #(
     // Main Control Logic
     reg transaction_ready;
     reg [15:0]  shift_reg;
-    reg [3:0]   bit_counter;
+    reg [4:0]   bit_counter;
     always @(posedge clk or negedge rst_n) begin
         if (rst_n) begin
             // Only operate when csn is active low
@@ -45,7 +45,7 @@ module spi_peripheral #(
                 end
 
                 // Transaction ready only after 2 bytes
-                if (bit_counter == 15) begin
+                if (bit_counter == 16) begin
                     transaction_ready <= 1;
                     bit_counter       <= 0; 
                 end else begin
@@ -87,11 +87,11 @@ module spi_peripheral #(
             end
         end else begin
             // Reset all registers
-            en_reg_out_7_0  <= 0;
-            en_reg_out_15_8 <= 0;
-            en_reg_pwm_7_0  <= 0;
-            en_reg_pwm_15_8 <= 0;
-            pwm_duty_cycle  <= 0;
+            en_reg_out_7_0    <= 0;
+            en_reg_out_15_8   <= 0;
+            en_reg_pwm_7_0    <= 0;
+            en_reg_pwm_15_8   <= 0;
+            pwm_duty_cycle    <= 0;
 
             transaction_ready <= 0;
             shift_reg         <= 0;
