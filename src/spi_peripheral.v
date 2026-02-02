@@ -19,22 +19,22 @@ module spi_peripheral #(
     // CDC SPI Bus Sync and edge detection (SPI_MODE_0)
     reg sclk_ff, sclk, sclk_prev, mosi_ff, mosi, cs_n_ff, cs_n;
     reg sclk_posedge;
-    assign sclk_posedge = (sclk==1 & sclk_prev==0) ? 1 : 0;
     always @(posedge clk) begin
-        sclk_ff     <= sclk_raw;
-        sclk        <= sclk_ff;
-        sclk_prev   <= sclk;
-        mosi_ff     <= mosi_raw;
-        mosi        <= mosi_ff;
-        cs_n_ff     <= cs_n_raw;
-        cs_n        <= cs_n_ff;
+        sclk_ff      <= sclk_raw;
+        sclk         <= sclk_ff;
+        sclk_prev    <= sclk;
+        mosi_ff      <= mosi_raw;
+        mosi         <= mosi_ff;
+        cs_n_ff      <= cs_n_raw;
+        cs_n         <= cs_n_ff;
+        sclk_posedge <= (sclk==1 & sclk_prev==0) ? 1 : 0;
     end
 
     // Main Control Logic
     reg transaction_ready;
     reg [15:0]  shift_reg;
     reg [3:0]   bit_counter;
-    always @(posedge clk) begin
+    always @(posedge clk or negedge rst_n) begin
         if (rst_n) begin
             // Only operate when csn is active low
             if (!cs_n) begin
@@ -95,7 +95,7 @@ module spi_peripheral #(
 
             transaction_ready <= 0;
             shift_reg         <= 0;
-            bit_counter       <= 0;    
+            bit_counter       <= 0;
         end
     end
 

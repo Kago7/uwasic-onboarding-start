@@ -22,7 +22,7 @@ module tt_um_uwasic_onboarding_kago (
   assign uio_oe  = 8'hFF;
 
   // List all unused inputs to prevent warnings
-  wire _unused = &{ena, clk, rst_n, 1'b0};
+  wire _unused = &{ena, clk, rst_n, ui_in[7:3], uio_in[7:0], 1'b0};
 
   // Create wires to refer to the values of the registers
   wire [7:0] en_reg_out_7_0;
