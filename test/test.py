@@ -153,7 +153,17 @@ async def test_spi(dut):
 
 @cocotb.test()
 async def test_pwm_freq(dut):
-    # Write your test here
+    # Start clock
+    clock = Clock(dut.clk, 100, units="ns")
+    cocotb.start_soon(clock.start())
+
+    # Reset
+    dut.ena.value = 1
+    dut.rst_n.value = 0
+    dut.ui_in.value = ui_in_logicarray(1, 0, 0)
+    await ClockCycles(dut.clk, 5)
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 5)
     
     # Set 50% duty cycle pwm on all outputs to test frequency.
     dut._log.info("Write transaction, address 0x00, data 0xFF")
