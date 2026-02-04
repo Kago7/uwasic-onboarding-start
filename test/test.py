@@ -3,7 +3,9 @@
 
 import cocotb
 from cocotb.clock import Clock
+from cocotb.utils import get_sim_time
 from cocotb.triggers import RisingEdge
+from cocotb.triggers import FallingEdge
 from cocotb.triggers import ClockCycles
 from cocotb.types import Logic
 from cocotb.types import LogicArray
@@ -152,6 +154,47 @@ async def test_spi(dut):
 @cocotb.test()
 async def test_pwm_freq(dut):
     # Write your test here
+    
+    # Set 50% duty cycle pwm on all outputs to test frequency.
+    dut._log.info("Write transaction, address 0x00, data 0xFF")
+    ui_in_val = await send_spi_transaction(dut, 1, 0x00, 0xFF)  # Write transaction
+    await ClockCycles(dut.clk, 30000)
+    dut._log.info("Write transaction, address 0x01, data 0xFF")
+    ui_in_val = await send_spi_transaction(dut, 1, 0x01, 0xFF)  # Write transaction
+    await ClockCycles(dut.clk, 30000)
+    dut._log.info("Write transaction, address 0x02, data 0xFF")
+    ui_in_val = await send_spi_transaction(dut, 1, 0x02, 0xFF)  # Write transaction
+    await ClockCycles(dut.clk, 30000)
+    dut._log.info("Write transaction, address 0x03, data 0xFF")
+    ui_in_val = await send_spi_transaction(dut, 1, 0x03, 0xFF)  # Write transaction
+    await ClockCycles(dut.clk, 30000)
+    dut._log.info("Write transaction, address 0x04, data 0x80")
+    ui_in_val = await send_spi_transaction(dut, 1, 0x04, 0x80)  # Write transaction
+    await ClockCycles(dut.clk, 30000)
+    
+    # Measure frequency for all outputs
+    for i in range(8):
+        # Wait for first rising edge
+        await RisingEdge(dut.uo_out[i])
+        t1 = get_sim_time(units="sec")
+        # Wait for second rising edge
+        await RisingEdge(dut.uo_out[i])
+        t2 = get_sim_time(units="sec")
+        freq = 1/(t2 - t1)
+        dut._log.info(f"Frequency of uo_out{i} = {freq} Hz")
+        assert (3000*0.99 < freq < 3000*1.01)
+        
+    for i in range(8):
+        # Wait for first rising edge
+        await RisingEdge(dut.uio_out[i])
+        t1 = get_sim_time(units="sec")
+        # Wait for second rising edge
+        await RisingEdge(dut.uio_out[i])
+        t2 = get_sim_time(units="sec")
+        freq = 1/(t2 - t1)
+        dut._log.info(f"Frequency of uio_out{i} = {freq} Hz")
+        assert (3000*0.99 < freq < 3000*1.01)
+    
     dut._log.info("PWM Frequency test completed successfully")
 
 
