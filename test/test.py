@@ -190,8 +190,9 @@ async def test_pwm_freq(dut):
         # initial value of signal wait for it to be 0
         t1 = 0
         t2 = 1
-        while(dut.uo_out.value[i]):
-            await ClockCycles(dut.clk, 10)
+        while(1):
+            await ClockCycles(dut.clk, 100)
+            dut._log.info(dut.uo_out.value[i])
 
         # Wait for first rising edge
         while (1):
