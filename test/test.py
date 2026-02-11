@@ -186,25 +186,55 @@ async def test_pwm_freq(dut):
     
     # Test frequency of all outputs
     for i in range(8):
+        # initial value of signal wait for it to be 0
+        t1 = 0
+        t2 = 0
+        while (dut.uo_out.value[i]):
+            pass
         # Wait for first rising edge
-        bit = dut.uo_out.value[i]
-        await RisingEdge(bit)
-        t1 = get_sim_time(units="sec")
+        while (1):
+            await RisingEdge(dut.uo_out)
+            t1 = get_sim_time(units="sec")
+            if (dut.uo_out.value[i]==1):
+                break
+        # wait for signal back to 0
+        while (dut.uo_out.value[i]):
+            pass
         # Wait for second rising edge
-        await RisingEdge(bit)
-        t2 = get_sim_time(units="sec")
+        while (1):
+            await RisingEdge(dut.uo_out)
+            t2 = get_sim_time(units="sec")
+            if (dut.uo_out.value[i]==1):
+                break
+        
+        
         freq = 1/(t2 - t1)
         dut._log.info(f"Frequency of uo_out{i} = {freq} Hz")
         assert (3000*0.99 < freq < 3000*1.01)
         
     for i in range(8):
+        # initial value of signal wait for it to be 0
+        t1 = 0
+        t2 = 0
+        while (dut.uio_out.value[i]):
+            pass
         # Wait for first rising edge
-        bit = dut.uio_out.value[i]
-        await RisingEdge(bit)
-        t1 = get_sim_time(units="sec")
+        while (1):
+            await RisingEdge(dut.uio_out)
+            t1 = get_sim_time(units="sec")
+            if (dut.uio_out.value[i]==1):
+                break
+        # wait for signal back to 0
+        while (dut.uio_out.value[i]):
+            pass
         # Wait for second rising edge
-        await RisingEdge(bit)
-        t2 = get_sim_time(units="sec")
+        while (1):
+            await RisingEdge(dut.uio_out)
+            t2 = get_sim_time(units="sec")
+            if (dut.uio_out.value[i]==1):
+                break
+        
+        
         freq = 1/(t2 - t1)
         dut._log.info(f"Frequency of uio_out{i} = {freq} Hz")
         assert (3000*0.99 < freq < 3000*1.01)
