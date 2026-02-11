@@ -195,7 +195,7 @@ async def test_pwm_freq(dut):
         dut._log.info(dut.uo_out.value[i])
         dut._log.info(dut.uo_out[i].value)
         # Wait for first rising edge
-        await RisingEdge(dut.uo_out[i].value)
+        await RisingEdge(dut.uo_out.value[i])
         # while (1):
         #     await RisingEdge(dut.uo_out)
         #     t1 = get_sim_time(units="sec")
