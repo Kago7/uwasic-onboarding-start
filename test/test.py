@@ -187,7 +187,7 @@ async def test_pwm_freq(dut):
     # Test frequency of all outputs
     for i in range(8):
         # Wait for first rising edge
-        bit = dut.uo_out[i]
+        bit = dut.uo_out.value[i]
         await RisingEdge(bit)
         t1 = get_sim_time(units="sec")
         # Wait for second rising edge
@@ -199,7 +199,7 @@ async def test_pwm_freq(dut):
         
     for i in range(8):
         # Wait for first rising edge
-        bit = dut.uio_out[i]
+        bit = dut.uio_out.value[i]
         await RisingEdge(bit)
         t1 = get_sim_time(units="sec")
         # Wait for second rising edge
