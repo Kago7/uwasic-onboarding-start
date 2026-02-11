@@ -190,28 +190,28 @@ async def test_pwm_freq(dut):
         # initial value of signal wait for it to be 0
         t1 = 0
         t2 = 1
-        dut._log.info("debug:")
-        while(1):
-            await ClockCycles(dut.clk, 500)
-            dut._log.info(dut.uo_out.value)
-        # dut._log.info(dut.uo_out.value[i])
-        # dut._log.info(dut.uo_out[i].value)
+        while(dut.uo_out.value[i]):
+            await ClockCycles(dut.clk, 10)
+
         # Wait for first rising edge
-        # await RisingEdge(dut.uo_out.value[i])
-        # while (1):
-        #     await RisingEdge(dut.uo_out)
-        #     t1 = get_sim_time(units="sec")
-        #     if (dut.uo_out.value[i]==1):
-        #         break
-        # # wait for signal back to 0
-        # dut._log.info(dut.uo_out.value[i])
-        # # Wait for second rising edge
-        # while (1):
-        #     await RisingEdge(dut.uo_out)
-        #     t2 = get_sim_time(units="sec")
-        #     if (dut.uo_out.value[i]==1):
-        #         break
-        
+        while (1):
+            await RisingEdge(dut.uo_out)
+            t1 = get_sim_time(units="sec")
+            if (dut.uo_out.value[i]==1):
+                break
+            await ClockCycles(dut.clk, 10)
+            
+        # wait for signal back to 0
+        while(dut.uo_out.value[i]):
+            await ClockCycles(dut.clk, 10)
+            
+        # Wait for second rising edge
+        while (1):
+            await RisingEdge(dut.uo_out)
+            t2 = get_sim_time(units="sec")
+            if (dut.uo_out.value[i]==1):
+                break
+            await ClockCycles(dut.clk, 10)
         
         freq = 1/(t2 - t1)
         dut._log.info(f"Frequency of uo_out{i} = {freq} Hz")
