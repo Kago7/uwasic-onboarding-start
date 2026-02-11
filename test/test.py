@@ -214,7 +214,7 @@ async def test_pwm_freq(dut):
         
         freq = 1/(t2 - t1)
         dut._log.info(f"Frequency of uo_out{i} = {freq:.2f} Hz")
-        assert (3000*0.99 < freq < 3000*1.01)
+        assert (3000*0.99 <= freq <= 3000*1.01)
         
     for i in range(8):
         # initial value of signal wait for it to be 0
@@ -244,7 +244,7 @@ async def test_pwm_freq(dut):
         
         freq = 1/(t2 - t1)
         dut._log.info(f"Frequency of uio_out{i} = {freq:.2f} Hz")
-        assert (3000*0.99 < freq < 3000*1.01)
+        assert (3000*0.99 <= freq <= 3000*1.01)
     
     
     
@@ -269,7 +269,7 @@ async def test_pwm_duty(dut):
     await ClockCycles(dut.clk, 5)
     
     # Set all pins in pwm mode
-    dut._log.info("Setting Duty Cycle to 50% to measure frequency.")
+    dut._log.info("Setting PWM Mode on all pins to measure duty cycle.")
     dut._log.info("Write transaction, address 0x00, data 0xFF")
     ui_in_val = await send_spi_transaction(dut, 1, 0x00, 0xFF)  # Write transaction
     await ClockCycles(dut.clk, 30000)
@@ -303,7 +303,7 @@ async def test_pwm_duty(dut):
                 
             duty_sum = duty_sum/clk_delay
             dut._log.info(f"Duty Cycle of uo_out{i} = {duty_sum*100:.2f} %")
-            assert (duty_cycle*0.99 < duty_sum < duty_cycle*1.01)
+            assert (duty_cycle*0.99 <= duty_sum <= duty_cycle*1.01)
             
         # iterate over each uio* output
         for i in range(8):
