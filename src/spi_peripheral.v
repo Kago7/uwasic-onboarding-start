@@ -1,9 +1,6 @@
 `default_nettype none
 
-module spi_peripheral #(
-    // PARAMETERS
-    parameter MAX_ADDRESS = 7'h04
-)(
+module spi_peripheral (
     input   wire            clk,
     input   wire            rst_n,
     input   wire            sclk_raw,
@@ -21,7 +18,6 @@ module spi_peripheral #(
     reg sclk_posedge;
 
     // Main Control Logic
-    reg transaction_ready;
     reg [15:0]  shift_reg;
     reg [3:0]   bit_counter;
     always @(posedge clk or negedge rst_n) begin
@@ -42,7 +38,6 @@ module spi_peripheral #(
             cs_n              <= 0;
             sclk_posedge      <= 0;
 
-            transaction_ready <= 0;
             shift_reg         <= 0;
             bit_counter       <= 0;
 
@@ -55,7 +50,7 @@ module spi_peripheral #(
             mosi         <= mosi_ff;
             cs_n_ff      <= cs_n_raw;
             cs_n         <= cs_n_ff;
-            sclk_posedge <= (sclk==1 & sclk_prev==0) ? 1 : 0;
+            sclk_posedge <= (sclk & ~sclk_prev);
 
             // Only operate SPI when csn is active low
             if (!cs_n) begin
@@ -65,15 +60,11 @@ module spi_peripheral #(
                     bit_counter <= bit_counter + 1;
                 end
 
-                // Transaction ready only after 2 bytes
-                if (bit_counter == 15) begin
-                    transaction_ready <= 1;
-                end
             end else begin
-                // Update on transaction ready
-                if (transaction_ready) begin
+                // Update on after transaction is done (16bits)
+                if (bit_counter==0) begin
                     // Handle the transaction only if it's a WRITE and ADDRESS in range.
-                    if (shift_reg[15] && (shift_reg[14:8] <= MAX_ADDRESS)) begin
+                    if (shift_reg[15]) begin
                         // Write data to registers
                         case(shift_reg[14:8])
                             7'h00   : en_reg_out_7_0    <= shift_reg[7:0];        
@@ -89,7 +80,6 @@ module spi_peripheral #(
                 // Reset transaction variables
                 shift_reg         <= 0;
                 bit_counter       <= 0; 
-                transaction_ready <= 0;
             end
         end
     end
