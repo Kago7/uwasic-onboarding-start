@@ -153,6 +153,8 @@ async def test_spi(dut):
 
 @cocotb.test()
 async def test_pwm_freq(dut):
+    dut._log.info("Start PWM Frequency test")
+    
     # Start clock
     clock = Clock(dut.clk, 100, units="ns")
     cocotb.start_soon(clock.start())
@@ -182,13 +184,14 @@ async def test_pwm_freq(dut):
     ui_in_val = await send_spi_transaction(dut, 1, 0x04, 0x80)  # Write transaction
     await ClockCycles(dut.clk, 500)
     
-    # Measure frequency for all outputs
+    # Test frequency of all outputs
     for i in range(8):
         # Wait for first rising edge
-        await RisingEdge(dut.uo_out[i])
+        bit = dut.uo_out[i]
+        await RisingEdge(bit)
         t1 = get_sim_time(units="sec")
         # Wait for second rising edge
-        await RisingEdge(dut.uo_out[i])
+        await RisingEdge(bit)
         t2 = get_sim_time(units="sec")
         freq = 1/(t2 - t1)
         dut._log.info(f"Frequency of uo_out{i} = {freq} Hz")
@@ -196,19 +199,41 @@ async def test_pwm_freq(dut):
         
     for i in range(8):
         # Wait for first rising edge
-        await RisingEdge(dut.uio_out[i])
+        bit = dut.uio_out[i]
+        await RisingEdge(bit)
         t1 = get_sim_time(units="sec")
         # Wait for second rising edge
-        await RisingEdge(dut.uio_out[i])
+        await RisingEdge(bit)
         t2 = get_sim_time(units="sec")
         freq = 1/(t2 - t1)
         dut._log.info(f"Frequency of uio_out{i} = {freq} Hz")
         assert (3000*0.99 < freq < 3000*1.01)
+    
+    
+    
     
     dut._log.info("PWM Frequency test completed successfully")
 
 
 @cocotb.test()
 async def test_pwm_duty(dut):
-    # Write your test here
+    dut._log.info("Start PWM Duty Cycle test")
+    
+    # Start clock
+    clock = Clock(dut.clk, 100, units="ns")
+    cocotb.start_soon(clock.start())
+
+    # Reset
+    dut.ena.value = 1
+    dut.rst_n.value = 0
+    dut.ui_in.value = ui_in_logicarray(1, 0, 0)
+    await ClockCycles(dut.clk, 5)
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 5)
+    
+    # Measure duty cycle {0%, 100%, 50%} for all outputs
+    duty_cycles = [0, 1, 0.5]
+    for duty_cycle in duty_cycles:
+        pass
+        
     dut._log.info("PWM Duty Cycle test completed successfully")
