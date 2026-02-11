@@ -268,9 +268,57 @@ async def test_pwm_duty(dut):
     dut.rst_n.value = 1
     await ClockCycles(dut.clk, 5)
     
-    # Measure duty cycle {0%, 100%, 50%} for all outputs
-    duty_cycles = [0, 1, 0.5]
+    # Set all pins in pwm mode
+    dut._log.info("Setting Duty Cycle to 50% to measure frequency.")
+    dut._log.info("Write transaction, address 0x00, data 0xFF")
+    ui_in_val = await send_spi_transaction(dut, 1, 0x00, 0xFF)  # Write transaction
+    await ClockCycles(dut.clk, 30000)
+    dut._log.info("Write transaction, address 0x01, data 0xFF")
+    ui_in_val = await send_spi_transaction(dut, 1, 0x01, 0xFF)  # Write transaction
+    await ClockCycles(dut.clk, 30000)
+    dut._log.info("Write transaction, address 0x02, data 0xFF")
+    ui_in_val = await send_spi_transaction(dut, 1, 0x02, 0xFF)  # Write transaction
+    await ClockCycles(dut.clk, 30000)
+    dut._log.info("Write transaction, address 0x03, data 0xFF")
+    ui_in_val = await send_spi_transaction(dut, 1, 0x03, 0xFF)  # Write transaction
+    await ClockCycles(dut.clk, 30000)
+    
+    
+    # Measure duty cycle {0%, 50%, 100%} for all outputs
+    duty_cycles = [0x00, 0x80, 0xFF]
     for duty_cycle in duty_cycles:
-        pass
+        # first set the duty cycle
+        dut._log.info(f"Write transaction, address 0x04, data {duty_cycle:#x}")
+        ui_in_val = await send_spi_transaction(dut, 1, 0x04, duty_cycle)  # Write transaction
+        await ClockCycles(dut.clk, 30000)
+        
+        # iterate over each uo* output
+        for i in range(8):
+            # check period by averaging over period=1/3kHz cycles w.r.t clk (3333 clk cycles)
+            clk_delay = 3333
+            duty_sum = 0
+            for j in range(clk_delay):
+                duty_sum += dut.uo_out.value[i]
+                await ClockCycles(dut.clk, 1)
+                
+            duty_sum = duty_sum/clk_delay
+            dut._log.info(f"Duty Cycle of uo_out{i} = {duty_sum*100:.2f} %")
+            assert (duty_cycle*0.99 < duty_sum < duty_cycle*1.01)
+            
+        # iterate over each uio* output
+        for i in range(8):
+            # check period by averaging over period=1/3kHz cycles w.r.t clk (3333 clk cycles)
+            clk_delay = 3333
+            duty_sum = 0
+            for j in range(clk_delay):
+                duty_sum += dut.uio_out.value[i]
+                await ClockCycles(dut.clk, 1)
+                
+            duty_sum = duty_sum/clk_delay
+            dut._log.info(f"Duty Cycle of uio_out{i} = {duty_sum*100:.2f} %")
+            assert (duty_cycle*0.99 < duty_sum < duty_cycle*1.01)
+                
+            
+            
         
     dut._log.info("PWM Duty Cycle test completed successfully")
