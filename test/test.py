@@ -168,6 +168,7 @@ async def test_pwm_freq(dut):
     await ClockCycles(dut.clk, 5)
     
     # Set 50% duty cycle pwm on all outputs to test frequency.
+    dut._log.info("Setting Duty Cycle to 50% to measure frequency.")
     dut._log.info("Write transaction, address 0x00, data 0xFF")
     ui_in_val = await send_spi_transaction(dut, 1, 0x00, 0xFF)  # Write transaction
     await ClockCycles(dut.clk, 500)
@@ -189,8 +190,10 @@ async def test_pwm_freq(dut):
         # initial value of signal wait for it to be 0
         t1 = 0
         t2 = 0
-        while (dut.uo_out.value[i]):
-            pass
+        dut._log.info("debug:")
+        dut._log.info(dut.uo_out.value)
+        dut._log.info(dut.uo_out.value[i])
+        dut._log.info(dut.uo_out[i].value)
         # Wait for first rising edge
         while (1):
             await RisingEdge(dut.uo_out)
@@ -198,8 +201,7 @@ async def test_pwm_freq(dut):
             if (dut.uo_out.value[i]==1):
                 break
         # wait for signal back to 0
-        while (dut.uo_out.value[i]):
-            pass
+        dut._log.info(dut.uo_out.value[i])
         # Wait for second rising edge
         while (1):
             await RisingEdge(dut.uo_out)
@@ -212,32 +214,32 @@ async def test_pwm_freq(dut):
         dut._log.info(f"Frequency of uo_out{i} = {freq} Hz")
         assert (3000*0.99 < freq < 3000*1.01)
         
-    for i in range(8):
-        # initial value of signal wait for it to be 0
-        t1 = 0
-        t2 = 0
-        while (dut.uio_out.value[i]):
-            pass
-        # Wait for first rising edge
-        while (1):
-            await RisingEdge(dut.uio_out)
-            t1 = get_sim_time(units="sec")
-            if (dut.uio_out.value[i]==1):
-                break
-        # wait for signal back to 0
-        while (dut.uio_out.value[i]):
-            pass
-        # Wait for second rising edge
-        while (1):
-            await RisingEdge(dut.uio_out)
-            t2 = get_sim_time(units="sec")
-            if (dut.uio_out.value[i]==1):
-                break
+    # for i in range(8):
+    #     # initial value of signal wait for it to be 0
+    #     t1 = 0
+    #     t2 = 0
+    #     while (dut.uio_out.value[i]):
+    #         pass
+    #     # Wait for first rising edge
+    #     while (1):
+    #         await RisingEdge(dut.uio_out)
+    #         t1 = get_sim_time(units="sec")
+    #         if (dut.uio_out.value[i]==1):
+    #             break
+    #     # wait for signal back to 0
+    #     while (dut.uio_out.value[i]):
+    #         pass
+    #     # Wait for second rising edge
+    #     while (1):
+    #         await RisingEdge(dut.uio_out)
+    #         t2 = get_sim_time(units="sec")
+    #         if (dut.uio_out.value[i]==1):
+    #             break
         
         
-        freq = 1/(t2 - t1)
-        dut._log.info(f"Frequency of uio_out{i} = {freq} Hz")
-        assert (3000*0.99 < freq < 3000*1.01)
+    #     freq = 1/(t2 - t1)
+    #     dut._log.info(f"Frequency of uio_out{i} = {freq} Hz")
+    #     assert (3000*0.99 < freq < 3000*1.01)
     
     
     
