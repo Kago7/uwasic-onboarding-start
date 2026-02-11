@@ -191,28 +191,26 @@ async def test_pwm_freq(dut):
         t1 = 0
         t2 = 1
         while(dut.uo_out.value[i]==1):
-            await ClockCycles(dut.clk, 100)
+            await ClockCycles(dut.clk, 1)
             # dut._log.info(dut.uo_out.value[i])
 
         # Wait for first rising edge
         while (1):
-            await RisingEdge(dut.uo_out)
             t1 = get_sim_time(units="sec")
             if (dut.uo_out.value[i]==1):
                 break
-            await ClockCycles(dut.clk, 100)
+            await ClockCycles(dut.clk, 1)
             
         # wait for signal back to 0
         while(dut.uo_out.value[i]==1):
-            await ClockCycles(dut.clk, 100)
+            await ClockCycles(dut.clk, 1)
             
         # Wait for second rising edge
         while (1):
-            await RisingEdge(dut.uo_out)
             t2 = get_sim_time(units="sec")
             if (dut.uo_out.value[i]==1):
                 break
-            await ClockCycles(dut.clk, 10)
+            await ClockCycles(dut.clk, 1)
         
         freq = 1/(t2 - t1)
         dut._log.info(f"Frequency of uo_out{i} = {freq} Hz")
