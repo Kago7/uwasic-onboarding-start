@@ -33,9 +33,30 @@ module spi_peripheral #(
     // Main Control Logic
     reg transaction_ready;
     reg [15:0]  shift_reg;
-    reg [4:0]   bit_counter;
+    reg [3:0]   bit_counter;
     always @(posedge clk or negedge rst_n) begin
-        if (rst_n) begin
+        if (!rst_n) begin
+            // Reset all registers
+            en_reg_out_7_0    <= 0;
+            en_reg_out_15_8   <= 0;
+            en_reg_pwm_7_0    <= 0;
+            en_reg_pwm_15_8   <= 0;
+            pwm_duty_cycle    <= 0;
+
+            sclk_ff           <= 0;
+            sclk              <= 0; 
+            sclk_prev         <= 0; 
+            mosi_ff           <= 0; 
+            mosi              <= 0; 
+            cs_n_ff           <= 0; 
+            cs_n              <= 0;
+            sclk_posedge      <= 0;
+
+            transaction_ready <= 0;
+            shift_reg         <= 0;
+            bit_counter       <= 0;
+
+        end else begin
             // Only operate when csn is active low
             if (!cs_n) begin
                 // Shift data in as per SPI_MODE_0
@@ -45,7 +66,7 @@ module spi_peripheral #(
                 end
 
                 // Transaction ready only after 2 bytes
-                if (bit_counter == 16) begin
+                if (bit_counter == 15) begin
                     transaction_ready <= 1;
                 end
             end else begin
@@ -62,19 +83,7 @@ module spi_peripheral #(
                             7'h04   : pwm_duty_cycle    <= shift_reg[7:0];        
                             default :                                    ;
                         endcase
-                    end else begin
-                        en_reg_out_7_0  <= en_reg_out_7_0;
-                        en_reg_out_15_8 <= en_reg_out_15_8;
-                        en_reg_pwm_7_0  <= en_reg_pwm_7_0;
-                        en_reg_pwm_15_8 <= en_reg_pwm_15_8;
-                        pwm_duty_cycle  <= pwm_duty_cycle;
                     end
-                end else begin
-                    en_reg_out_7_0  <= en_reg_out_7_0;
-                    en_reg_out_15_8 <= en_reg_out_15_8;
-                    en_reg_pwm_7_0  <= en_reg_pwm_7_0;
-                    en_reg_pwm_15_8 <= en_reg_pwm_15_8;
-                    pwm_duty_cycle  <= pwm_duty_cycle;
                 end
 
                 // Reset transaction variables
@@ -82,17 +91,6 @@ module spi_peripheral #(
                 bit_counter       <= 0; 
                 transaction_ready <= 0;
             end
-        end else begin
-            // Reset all registers
-            en_reg_out_7_0    <= 0;
-            en_reg_out_15_8   <= 0;
-            en_reg_pwm_7_0    <= 0;
-            en_reg_pwm_15_8   <= 0;
-            pwm_duty_cycle    <= 0;
-
-            transaction_ready <= 0;
-            shift_reg         <= 0;
-            bit_counter       <= 0;
         end
     end
 
