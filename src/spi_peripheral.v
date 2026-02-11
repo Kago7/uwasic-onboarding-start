@@ -66,7 +66,7 @@ module spi_peripheral (
                     // Handle the transaction only if it's a WRITE and ADDRESS in range.
                     if (shift_reg[15]) begin
                         // Write data to registers
-                        case(shift_reg[10:8])
+                        case(shift_reg[14:12])
                             3'h0   : en_reg_out_7_0    <= shift_reg[7:0];        
                             3'h1   : en_reg_out_15_8   <= shift_reg[7:0];        
                             3'h2   : en_reg_pwm_7_0    <= shift_reg[7:0];        
