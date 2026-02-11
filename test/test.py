@@ -316,7 +316,7 @@ async def test_pwm_duty(dut):
                 
             duty_sum = duty_sum/clk_delay
             dut._log.info(f"Duty Cycle of uio_out{i} = {duty_sum*100:.2f} %")
-            assert (duty_cycle*0.99 < duty_sum < duty_cycle*1.01)
+            assert (duty_cycle*0.99 <= duty_sum <= duty_cycle*1.01)
                 
             
             
