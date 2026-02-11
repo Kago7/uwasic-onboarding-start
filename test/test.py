@@ -171,19 +171,19 @@ async def test_pwm_freq(dut):
     dut._log.info("Setting Duty Cycle to 50% to measure frequency.")
     dut._log.info("Write transaction, address 0x00, data 0xFF")
     ui_in_val = await send_spi_transaction(dut, 1, 0x00, 0xFF)  # Write transaction
-    await ClockCycles(dut.clk, 500)
+    await ClockCycles(dut.clk, 30000)
     dut._log.info("Write transaction, address 0x01, data 0xFF")
     ui_in_val = await send_spi_transaction(dut, 1, 0x01, 0xFF)  # Write transaction
-    await ClockCycles(dut.clk, 500)
+    await ClockCycles(dut.clk, 30000)
     dut._log.info("Write transaction, address 0x02, data 0xFF")
     ui_in_val = await send_spi_transaction(dut, 1, 0x02, 0xFF)  # Write transaction
-    await ClockCycles(dut.clk, 500)
+    await ClockCycles(dut.clk, 30000)
     dut._log.info("Write transaction, address 0x03, data 0xFF")
     ui_in_val = await send_spi_transaction(dut, 1, 0x03, 0xFF)  # Write transaction
-    await ClockCycles(dut.clk, 500)
+    await ClockCycles(dut.clk, 30000)
     dut._log.info("Write transaction, address 0x04, data 0x80")
     ui_in_val = await send_spi_transaction(dut, 1, 0x04, 0x80)  # Write transaction
-    await ClockCycles(dut.clk, 500)
+    await ClockCycles(dut.clk, 30000)
     
     # Test frequency of all outputs
     for i in range(8):
@@ -192,6 +192,7 @@ async def test_pwm_freq(dut):
         t2 = 1
         dut._log.info("debug:")
         while(1):
+            await ClockCycles(dut.clk, 500)
             dut._log.info(dut.uo_out.value)
         # dut._log.info(dut.uo_out.value[i])
         # dut._log.info(dut.uo_out[i].value)
