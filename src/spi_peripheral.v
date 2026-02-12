@@ -81,6 +81,7 @@ module spi_peripheral #(
 
                 // Reset transaction variables
                 bit_counter       <= 0; 
+                shift_reg         <= 0; 
             end
         end
     end
