@@ -38,8 +38,8 @@ module spi_peripheral #(
             sclk_prev         <= 0; 
             mosi_ff           <= 0; 
             mosi              <= 0; 
-            cs_n_ff           <= 0; 
-            cs_n              <= 0;
+            cs_n_ff           <= 1; 
+            cs_n              <= 1;
 
             shift_reg         <= 0;
             bit_counter       <= 0;
@@ -68,7 +68,7 @@ module spi_peripheral #(
                     // Handle the transaction only if it's a WRITE and ADDRESS in range.
                     if (shift_reg[15] && (shift_reg[14:8] <= MAX_ADDRESS)) begin
                         // Write data to registers
-                        case(shift_reg[10:8] )
+                        case(shift_reg[10:8])
                             3'h0   : en_reg_out_7_0    <= shift_reg[7:0];        
                             3'h1   : en_reg_out_15_8   <= shift_reg[7:0];        
                             3'h2   : en_reg_pwm_7_0    <= shift_reg[7:0];        
