@@ -2,7 +2,7 @@
 
 module spi_peripheral #(
     // PARAMETERS
-    parameter MAX_ADDRESS = 3'h4
+    parameter MAX_ADDRESS = 7'h04
 )(
     input   wire            clk,
     input   wire            rst_n,
