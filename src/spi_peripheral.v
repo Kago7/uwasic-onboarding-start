@@ -19,7 +19,6 @@ module spi_peripheral #(
     // CDC SPI Bus Sync and edge detection registers (SPI_MODE_0)
     reg sclk_ff, sclk, sclk_prev, mosi_ff, mosi, cs_n_ff, cs_n;
     reg sclk_posedge;
-    assign sclk_posedge = (sclk & ~sclk_prev);
 
     // Main Control Logic
     reg [15:0]  shift_reg;
@@ -41,6 +40,8 @@ module spi_peripheral #(
             cs_n_ff           <= 1; 
             cs_n              <= 1;
 
+            sclk_posedge      <= 0;
+
             shift_reg         <= 0;
             bit_counter       <= 0;
 
@@ -53,12 +54,13 @@ module spi_peripheral #(
             mosi         <= mosi_ff;
             cs_n_ff      <= cs_n_raw;
             cs_n         <= cs_n_ff;
+            sclk_posedge <= (sclk & ~sclk_prev);
 
             // Only operate SPI when csn is active low
             if (!cs_n) begin
                 // Shift data in as per SPI_MODE_0
                 if (sclk_posedge) begin
-                    shift_reg[15 - bit_counter] <= mosi;
+                    shift_reg   <= {shift_reg[14:0], mosi};
                     bit_counter <= bit_counter + 1;
                 end
 
@@ -74,7 +76,7 @@ module spi_peripheral #(
                             3'h2   : en_reg_pwm_7_0    <= shift_reg[7:0];        
                             3'h3   : en_reg_pwm_15_8   <= shift_reg[7:0];        
                             3'h4   : pwm_duty_cycle    <= shift_reg[7:0];        
-                            default :                                    ;
+                            default:                                    ;
                         endcase
                     end
                 end
