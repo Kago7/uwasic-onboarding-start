@@ -1,6 +1,9 @@
 `default_nettype none
 
-module spi_peripheral (
+module spi_peripheral #(
+    // PARAMETERS
+    parameter MAX_ADDRESS = 3'h4
+)(
     input   wire            clk,
     input   wire            rst_n,
     input   wire            sclk_raw,
@@ -16,6 +19,7 @@ module spi_peripheral (
     // CDC SPI Bus Sync and edge detection registers (SPI_MODE_0)
     reg sclk_ff, sclk, sclk_prev, mosi_ff, mosi, cs_n_ff, cs_n;
     reg sclk_posedge;
+    assign sclk_posedge = (sclk & ~sclk_prev);
 
     // Main Control Logic
     reg [15:0]  shift_reg;
@@ -36,7 +40,6 @@ module spi_peripheral (
             mosi              <= 0; 
             cs_n_ff           <= 0; 
             cs_n              <= 0;
-            sclk_posedge      <= 0;
 
             shift_reg         <= 0;
             bit_counter       <= 0;
@@ -50,7 +53,6 @@ module spi_peripheral (
             mosi         <= mosi_ff;
             cs_n_ff      <= cs_n_raw;
             cs_n         <= cs_n_ff;
-            sclk_posedge <= (sclk & ~sclk_prev);
 
             // Only operate SPI when csn is active low
             if (!cs_n) begin
@@ -64,9 +66,9 @@ module spi_peripheral (
                 // Update on after transaction is done (16bits)
                 if (bit_counter==0) begin
                     // Handle the transaction only if it's a WRITE and ADDRESS in range.
-                    if (shift_reg[15]) begin
+                    if (shift_reg[15] & (shift_reg[10:8] <= MAX_ADDRESS)) begin
                         // Write data to registers
-                        case(shift_reg[14:12])
+                        case(shift_reg[10:8] )
                             3'h0   : en_reg_out_7_0    <= shift_reg[7:0];        
                             3'h1   : en_reg_out_15_8   <= shift_reg[7:0];        
                             3'h2   : en_reg_pwm_7_0    <= shift_reg[7:0];        
@@ -78,7 +80,6 @@ module spi_peripheral (
                 end
 
                 // Reset transaction variables
-                shift_reg         <= 0;
                 bit_counter       <= 0; 
             end
         end
